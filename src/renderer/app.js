@@ -5,6 +5,8 @@ const bankFilePathInput = document.getElementById('bankFilePath');
 const qbFilePathInput = document.getElementById('qbFilePath');
 const selectBankBtn = document.getElementById('selectBankBtn');
 const selectQBBtn = document.getElementById('selectQBBtn');
+const geminiApiKeyInput = document.getElementById('geminiApiKey');
+const analyzeVendorsBtn = document.getElementById('analyzeVendorsBtn');
 const processBtn = document.getElementById('processBtn');
 const openResultsBtn = document.getElementById('openResultsBtn');
 const clearLogsBtn = document.getElementById('clearLogsBtn');
@@ -22,7 +24,9 @@ const statUnmatchedQB = document.getElementById('statUnmatchedQB');
 let bankFilePath = null;
 let qbFilePath = null;
 let isProcessing = false;
+let isAnalyzing = false;
 let lastResultsFolder = null;
+let aiVendorMappings = null;
 
 /**
  * Initialize application
@@ -72,6 +76,50 @@ selectQBBtn.addEventListener('click', async () => {
     qbFilePathInput.value = fileName;
     addLog(`✓ QuickBooks file selected: ${fileName}`, 'success');
     updateProcessButton();
+    updateAnalyzeButton();
+  }
+});
+
+/**
+ * Enable/disable analyze vendors button
+ */
+geminiApiKeyInput.addEventListener('input', () => {
+  updateAnalyzeButton();
+});
+
+/**
+ * Analyze vendors with Gemini AI
+ */
+analyzeVendorsBtn.addEventListener('click', async () => {
+  const apiKey = geminiApiKeyInput.value.trim();
+  
+  if (!apiKey) {
+    addLog('❌ Please enter Gemini API key', 'error');
+    return;
+  }
+
+  if (!bankFilePath || !qbFilePath) {
+    addLog('❌ Please select both files first', 'error');
+    return;
+  }
+
+  isAnalyzing = true;
+  updateAnalyzeButton();
+
+  try {
+    const result = await window.electronAPI.analyzeVendorsGemini(apiKey, bankFilePath, qbFilePath);
+
+    if (result.success) {
+      aiVendorMappings = result.mappings;
+      addLog(`✅ AI mappings applied and ready for processing`, 'success');
+    } else {
+      addLog(`❌ AI analysis failed: ${result.error}`, 'error');
+    }
+  } catch (error) {
+    addLog(`❌ Unexpected error: ${error.message}`, 'error');
+  } finally {
+    isAnalyzing = false;
+    updateAnalyzeButton();
   }
 });
 
@@ -94,7 +142,7 @@ processBtn.addEventListener('click', async () => {
   addLog('═══════════════════════════════════════════════════════════', 'info');
 
   try {
-    const result = await window.electronAPI.processReconciliation(bankFilePath, qbFilePath);
+    const result = await window.electronAPI.processReconciliation(bankFilePath, qbFilePath, aiVendorMappings);
 
     if (result.success) {
       lastResultsFolder = result.outputDir;
@@ -167,6 +215,26 @@ function updateProcessButton() {
   const spinner = processBtn.querySelector('.spinner');
   
   if (isProcessing) {
+    btnText.style.display = 'none';
+    spinner.style.display = 'inline';
+  } else {
+    btnText.style.display = 'inline';
+    spinner.style.display = 'none';
+  }
+}
+
+/**
+ * Update analyze vendors button state
+ */
+function updateAnalyzeButton() {
+  const hasFiles = bankFilePath && qbFilePath;
+  const hasApiKey = geminiApiKeyInput.value.trim().length > 0;
+  analyzeVendorsBtn.disabled = !hasFiles || !hasApiKey || isAnalyzing;
+  
+  const btnText = analyzeVendorsBtn.querySelector('.btn-text');
+  const spinner = analyzeVendorsBtn.querySelector('.spinner');
+  
+  if (isAnalyzing) {
     btnText.style.display = 'none';
     spinner.style.display = 'inline';
   } else {

@@ -58,10 +58,12 @@ export class GLMatcher {
   private bankTransactions: BankTransaction[] = [];
   private qbTransactions: QBTransaction[] = [];
   private matched: MatchedPair[] = [];
+  private additionalMappings: { [key: string]: string[] } = {};
 
-  constructor(bank: BankTransaction[], qb: QBTransaction[]) {
+  constructor(bank: BankTransaction[], qb: QBTransaction[], additionalMappings?: { [key: string]: string[] }) {
     this.bankTransactions = bank.map(t => ({ ...t, matched: false }));
     this.qbTransactions = qb.map(t => ({ ...t, matched: false }));
+    this.additionalMappings = additionalMappings || {};
   }
 
   /**
@@ -403,14 +405,15 @@ export class GLMatcher {
       }
     }
 
-    // Vendor mappings
+    // Vendor mappings (base + AI-generated)
     const mappings: { [key: string]: string[] } = {
       'CITI CARD': ['CITIBANK', 'CITI CARD ONLINE', 'CITICTP'],
       'BANK OF AMERICA': ['BK OF', 'BK OF AMER VISA', 'BANK OF AMERICA'],
       'CHASE': ['CHASE CREDIT CARD', 'CHASE CARD', 'CHASE BANK'],
       'SBA': ['SBA LOAN', 'SBA EIDL', 'SBA EIDL LOAN'],
       'BRANDUSA': ['BRANDUSA NIRO', 'BRANDUSA'],
-      'KATERINA': ['KATRINA', 'KATERINA OHANYAN', 'KATRINA OHANYAN']
+      'KATERINA': ['KATRINA', 'KATERINA OHANYAN', 'KATRINA OHANYAN'],
+      ...this.additionalMappings  // Merge AI-generated mappings
     };
 
     for (const [key, variants] of Object.entries(mappings)) {

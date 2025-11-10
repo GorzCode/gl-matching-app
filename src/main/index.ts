@@ -9,6 +9,7 @@ import {
   exportUnmatchedQBCSV, 
   generateReport 
 } from './exporter';
+import { analyzeVendorsWithGemini } from './gemini-analyzer';
 
 let mainWindow: BrowserWindow | null = null;
 let lastResults: {
@@ -104,7 +105,7 @@ ipcMain.handle('select-qb-file', async () => {
 /**
  * IPC: Process reconciliation
  */
-ipcMain.handle('process-reconciliation', async (_event, bankPath: string, qbPath: string) => {
+ipcMain.handle('process-reconciliation', async (_event, bankPath: string, qbPath: string, aiMappings?: { [key: string]: string[] }) => {
   try {
     log('Starting reconciliation process...', 'info');
 
@@ -126,7 +127,10 @@ ipcMain.handle('process-reconciliation', async (_event, bankPath: string, qbPath
 
     // Run matching
     log('Step 3: Running intelligent matching algorithm...', 'info');
-    const matcher = new GLMatcher(bankTransactions, qbTransactions);
+    if (aiMappings && Object.keys(aiMappings).length > 0) {
+      log(`  Using ${Object.keys(aiMappings).length} AI-generated vendor mappings`, 'info');
+    }
+    const matcher = new GLMatcher(bankTransactions, qbTransactions, aiMappings);
     const result = matcher.match();
 
     log(`✓ Matching complete!`, 'success');
@@ -193,6 +197,52 @@ ipcMain.handle('process-reconciliation', async (_event, bankPath: string, qbPath
     return {
       success: false,
       error: error.message
+    };
+  }
+});
+
+/**
+ * IPC: Analyze vendors with Gemini AI
+ */
+ipcMain.handle('analyze-vendors-gemini', async (_event, apiKey: string, bankPath: string, qbPath: string) => {
+  try {
+    log('🤖 Starting AI vendor analysis...', 'info');
+    
+    // Parse files
+    const bankTransactions = await parseBankCSV(bankPath);
+    const qbTransactions = await parseQBExcel(qbPath);
+    
+    log(`Extracted ${bankTransactions.length} bank vendors and ${qbTransactions.length} QB vendors`, 'info');
+    
+    // Call Gemini
+    const mappings = await analyzeVendorsWithGemini(apiKey, bankTransactions, qbTransactions);
+    
+    const mappingCount = Object.keys(mappings).length;
+    let totalVariants = 0;
+    for (const variants of Object.values(mappings)) {
+      totalVariants += variants.length;
+    }
+    
+    log(`✅ AI found ${mappingCount} vendor groups with ${totalVariants} total mappings`, 'success');
+    
+    // Log each mapping
+    for (const [canonical, variants] of Object.entries(mappings)) {
+      log(`  ${canonical} ← [${variants.join(', ')}]`, 'info');
+    }
+    
+    return { 
+      success: true, 
+      mappings,
+      stats: {
+        groups: mappingCount,
+        totalVariants
+      }
+    };
+  } catch (error: any) {
+    log(`❌ AI analysis failed: ${error.message}`, 'error');
+    return { 
+      success: false, 
+      error: error.message 
     };
   }
 });

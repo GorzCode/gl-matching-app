@@ -8,8 +8,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   selectQBFile: () => ipcRenderer.invoke('select-qb-file'),
   
   // Processing
-  processReconciliation: (bankPath: string, qbPath: string) => 
-    ipcRenderer.invoke('process-reconciliation', bankPath, qbPath),
+  processReconciliation: (bankPath: string, qbPath: string, aiMappings?: { [key: string]: string[] }) => 
+    ipcRenderer.invoke('process-reconciliation', bankPath, qbPath, aiMappings),
+  
+  // AI Vendor Analysis
+  analyzeVendorsGemini: (apiKey: string, bankPath: string, qbPath: string) =>
+    ipcRenderer.invoke('analyze-vendors-gemini', apiKey, bankPath, qbPath),
   
   // Results
   openResultsFolder: (folderPath: string) => 

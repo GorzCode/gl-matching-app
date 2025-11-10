@@ -47,6 +47,24 @@
                 <p class="help-text">Select your QuickBooks General Ledger Excel file</p>
             </section>
 
+            <!-- Step 2.5: AI Vendor Mapping (Optional) -->
+            <section class="card">
+                <h2>2.5 AI Vendor Mapping (Optional)</h2>
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        id="geminiApiKey" 
+                        placeholder="Enter Gemini API Key (optional)"
+                        class="input-field"
+                    >
+                    <button id="analyzeVendorsBtn" class="btn btn-secondary" disabled>
+                        <span class="btn-text">🤖 Analyze Vendors</span>
+                        <span class="spinner" style="display: none;">⏳</span>
+                    </button>
+                </div>
+                <p class="help-text">AI will analyze vendor names and auto-apply smart mappings</p>
+            </section>
+
             <!-- Step 3: Processing -->
             <section class="card">
                 <h2>3. Process & Match Transactions</h2>
