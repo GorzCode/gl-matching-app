@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+build/
+dist/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Electron
+.cache/
+temp/
+
+# Output files (if you want to ignore test results)
+# Uncomment if you don't want to commit test outputs:
+# *_Matched_Transactions*.csv
+# *_Unmatched_*.csv
+# *_Reconciliation_Report*.txt

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aritas GL Matching</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ARITAS ADVISORS</h1>
+            <p class="subtitle">GL and Bank Statement Processing & Analysis</p>
+            <p class="tagline">Strategic Finance Solutions for Your Business</p>
+        </header>
+
+        <div class="content">
+            <!-- Step 1: Bank File -->
+            <section class="card">
+                <h2>1. Select Bank Transactions CSV</h2>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="bankFilePath" 
+                        placeholder="Click 'Browse' to select CSV"
+                        class="input-field"
+                        readonly
+                    >
+                    <button id="selectBankBtn" class="btn btn-secondary">Browse</button>
+                </div>
+                <p class="help-text">Select your bank transactions CSV file</p>
+            </section>
+
+            <!-- Step 2: QuickBooks File -->
+            <section class="card">
+                <h2>2. Select QuickBooks GL Excel</h2>
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="qbFilePath" 
+                        placeholder="Click 'Browse' to select Excel file"
+                        class="input-field"
+                        readonly
+                    >
+                    <button id="selectQBBtn" class="btn btn-secondary">Browse</button>
+                </div>
+                <p class="help-text">Select your QuickBooks General Ledger Excel file</p>
+            </section>
+
+            <!-- Step 3: Processing -->
+            <section class="card">
+                <h2>3. Process & Match Transactions</h2>
+                <div class="button-group">
+                    <button id="processBtn" class="btn btn-primary" disabled>
+                        <span class="btn-text">Start Processing</span>
+                        <span class="spinner" style="display: none;">⏳</span>
+                    </button>
+                    <button id="openResultsBtn" class="btn btn-success" disabled>
+                        Open Results Folder
+                    </button>
+                </div>
+            </section>
+
+            <!-- Results Summary -->
+            <section class="card" id="resultsStats" style="display:none;">
+                <h2>Results Summary</h2>
+                <div class="results-summary">
+                    <div class="result-item">
+                        <div class="result-label">Matched:</div>
+                        <div class="result-value matched" id="statMatched">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Match Rate:</div>
+                        <div class="result-value rate" id="statMatchRate">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Unmatched Bank:</div>
+                        <div class="result-value unmatched" id="statUnmatchedBank">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">Unmatched QB:</div>
+                        <div class="result-value unmatched" id="statUnmatchedQB">-</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Logs Section -->
+            <section class="card logs-section">
+                <div class="logs-header">
+                    <h2>Processing Logs</h2>
+                    <button id="clearLogsBtn" class="btn btn-small">Clear Logs</button>
+                </div>
+                <div id="logs" class="logs"></div>
+            </section>
+        </div>
+
+        <footer>
+            <p class="footer-info">All data stored locally on your machine | Secure processing</p>
+            <p class="copyright">© 2025 Aritas Advisors. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

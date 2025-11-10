@@ -1,0 +1,43 @@
+{
+  "name": "aritas-gl-matching",
+  "version": "1.0.0",
+  "description": "GL Matching and Bank Reconciliation Tool for Aritas Advisors",
+  "main": "build/main/index.js",
+  "scripts": {
+    "build": "tsc && npm run copy-renderer && npm run copy-assets",
+    "copy-renderer": "node -e \"const fs=require('fs');const path=require('path');const src='src/renderer';const dest='build/renderer';fs.mkdirSync(dest,{recursive:true});fs.readdirSync(src).forEach(f=>fs.copyFileSync(path.join(src,f),path.join(dest,f)))\"",
+    "copy-assets": "node -e \"const fs=require('fs');const path=require('path');const src='assets';const dest='build/assets';if(fs.existsSync(src)){fs.mkdirSync(dest,{recursive:true});fs.readdirSync(src).forEach(f=>fs.copyFileSync(path.join(src,f),path.join(dest,f)))}\"",
+    "dev": "npm run build && electron .",
+    "build:exe": "npm run build && electron-builder --win portable"
+  },
+  "build": {
+    "appId": "com.aritasadvisors.glmatching",
+    "productName": "Aritas GL Matching",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "assets/icon.ico"
+    }
+  },
+  "dependencies": {
+    "electron": "33.0.2",
+    "papaparse": "^5.4.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/papaparse": "^5.3.15",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.6.3"
+  },
+  "author": "Aritas Advisors",
+  "license": "ISC"
+}
