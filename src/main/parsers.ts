@@ -115,12 +115,15 @@ export function parseQBExcel(filePath: string, year?: number): QBTransaction[] {
       const credit = Math.round(parseFloat(rowObj['Credit']?.toString().replace(/,/g, '') || '0') * 100) / 100;
       const amount = Math.round(parseFloat(rowObj['Amount']?.toString().replace(/,/g, '') || '0') * 100) / 100;
 
+      // Use Split field as fallback for name if Name is empty
+      const name = rowObj['Name']?.trim() || rowObj['Split']?.trim() || '';
+
       transactions.push({
         date,
         transNumber: rowObj['Trans #'] || '',
         type: rowObj['Type'] || '',
         account: rowObj['Account'] || '',
-        name: rowObj['Name'] || '',
+        name,
         memo: rowObj['Memo'] || '',
         split: rowObj['Split'] || '',
         debit,

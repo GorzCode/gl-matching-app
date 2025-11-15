@@ -126,7 +126,13 @@ export class GLMatcher {
         this.getQBAmount(qb, bank.type) === bankAmount
       );
 
+      // Match if exactly one candidate
       if (candidates.length === 1) {
+        this.createMatch('Exact', bank, candidates[0], i, this.qbTransactions.indexOf(candidates[0]));
+        count++;
+      }
+      // If multiple candidates and ALL have empty account field, pick the first one
+      else if (candidates.length > 1 && candidates.every(qb => !qb.account || qb.account.trim() === '')) {
         this.createMatch('Exact', bank, candidates[0], i, this.qbTransactions.indexOf(candidates[0]));
         count++;
       }
@@ -152,7 +158,13 @@ export class GLMatcher {
         this.getQBAmount(qb, bank.type) === bankAmount
       );
 
+      // Match if exactly one candidate
       if (candidates.length === 1) {
+        this.createMatch(`Near Date (±${days}d)`, bank, candidates[0], i, this.qbTransactions.indexOf(candidates[0]));
+        count++;
+      }
+      // If multiple candidates and ALL have empty account field, pick the first one
+      else if (candidates.length > 1 && candidates.every(qb => !qb.account || qb.account.trim() === '')) {
         this.createMatch(`Near Date (±${days}d)`, bank, candidates[0], i, this.qbTransactions.indexOf(candidates[0]));
         count++;
       }
